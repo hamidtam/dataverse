@@ -20,6 +20,7 @@ import edu.harvard.iq.dataverse.MetadataBlockServiceBean;
 import edu.harvard.iq.dataverse.TermsOfUseAndAccess;
 import edu.harvard.iq.dataverse.api.Util;
 import edu.harvard.iq.dataverse.api.dto.FieldDTO;
+import edu.harvard.iq.dataverse.authorization.groups.impl.affiliation.AffiliationGroup;
 import edu.harvard.iq.dataverse.authorization.groups.impl.ipaddress.IpGroup;
 import edu.harvard.iq.dataverse.authorization.groups.impl.ipaddress.ip.IpAddress;
 import edu.harvard.iq.dataverse.authorization.groups.impl.ipaddress.ip.IpAddressRange;
@@ -50,6 +51,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -301,6 +303,21 @@ public class JsonParser {
             enums.add(Enum.valueOf(enumClass, name));
         }
         return enums;
+    }
+
+    public Stream<AffiliationGroup> parseAffiliationGroups(JsonObject object) {
+        JsonArray jsonArray = object.getJsonArray("affiliations");
+        Stream<AffiliationGroup> affiliationGroupStream = jsonArray.stream().map(jsonValue -> (JsonObject) jsonValue).map(this::parseAffiliationGroup);
+        return affiliationGroupStream;
+    }
+
+    public AffiliationGroup parseAffiliationGroup(JsonObject object) {
+        AffiliationGroup group = new AffiliationGroup();
+        group.setDisplayName(object.getString("name", null));
+        group.setDescription(object.getString("description", null));
+        group.setPersistedGroupAlias(object.getString("alias", null));
+        group.setEmaildomain(object.getString("emaildomain", null));
+        return group;
     }
 
     public DatasetVersion parseDatasetVersion(JsonObject obj) throws JsonParseException {
