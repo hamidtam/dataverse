@@ -96,6 +96,9 @@ public class ExternalTool implements Serializable {
     @Column(nullable = true, columnDefinition = "TEXT")
     private String contentType;
 
+    @Transient
+    private String displayNameLang;
+
     /**
      * Set of API calls the tool would like to be able to use (e,.g. for retrieving
      * data through the Dataverse REST API). Used to build signedUrls for POST
@@ -211,6 +214,10 @@ public class ExternalTool implements Serializable {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    public void setDisplayNameLang(String displayNameLang) {
+        this.displayNameLang = displayNameLang;
     }
 
     public String  getToolName() { return toolName; }
