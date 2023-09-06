@@ -9,7 +9,6 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.inject.Named;
 import javax.persistence.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -52,6 +51,7 @@ public class AffiliationGroupServiceBean {
         }
     }
 
+
     public AffiliationGroup find(String userEmail) {
         String topLevelDomain = null;
         String domain = userEmail.substring(userEmail.indexOf("@")+1).trim();
@@ -62,7 +62,13 @@ public class AffiliationGroupServiceBean {
         } else {
             topLevelDomain = domain;
         }
-        AffiliationGroup group = matchByTopLevelEmailDomain(topLevelDomain);
+
+        // JC - throws error because qc.ca gives multiple results
+        // cmontmorency.qc.ca , cdc.qc.ca , cmaisonneuve.qc.ca
+
+        // topleveldomain = qc.ca
+
+        AffiliationGroup group = matchByTopLevelEmailDomain(topLevelDomain,domain);
 
         if (group != null) {
             String emaildomain = group.getEmaildomain();
@@ -80,6 +86,7 @@ public class AffiliationGroupServiceBean {
         }
         return null;
     }
+
 
     public List<AffiliationGroup> findAll() {
         return em.createNamedQuery("AffiliationGroup.findAll", AffiliationGroup.class).getResultList();
@@ -143,11 +150,19 @@ public class AffiliationGroupServiceBean {
         return (AffiliationGroup) em.find(AffiliationGroup.class, pk);
     }
 
-    private AffiliationGroup matchByTopLevelEmailDomain(String emaildomain) {
+    private AffiliationGroup matchByTopLevelEmailDomain(String emaildomain, String domain) {
         try {
             TypedQuery<AffiliationGroup> namedQuery = em.createNamedQuery("AffiliationGroup.findByEmailDomain", AffiliationGroup.class);
             namedQuery.setParameter("emailDomain", "%" + emaildomain.toUpperCase() + "%");
-            return namedQuery.getSingleResult();
+            int size = namedQuery.getResultList().size();
+            if(size == 1) {
+                return namedQuery.getSingleResult();
+            }
+            else {
+                namedQuery = em.createNamedQuery("AffiliationGroup.findByEmailDomain", AffiliationGroup.class);
+                namedQuery.setParameter("emailDomain", "%" + domain.toUpperCase() + "%");
+                return namedQuery.getSingleResult();
+            }
         } catch (NoResultException nre) {
             return null;
         }
