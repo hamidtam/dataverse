@@ -67,7 +67,20 @@ public class AffiliationServiceBean implements Serializable {
             String next = enumeration.nextElement();
             String value = bundle.getString(next);
             if (value.equalsIgnoreCase(userAffiliation)) {
-                return next.substring(next.indexOf(".") + 1);
+                String alias = next.substring(next.indexOf(".") + 1);
+                if(alias.equalsIgnoreCase("jonquiere") ||
+                        alias.equalsIgnoreCase("montmorency") ||
+                        alias.equalsIgnoreCase("levis") ||
+                        alias.equalsIgnoreCase("cdc") ||
+                        alias.equalsIgnoreCase("maisonneuve")
+                )
+                {
+                    return "cegep";
+                }
+                else
+                {
+                    return alias;
+                }
             }
         }
         logger.log(Level.SEVERE, "Unable to find alias for {0}", userAffiliation);
