@@ -174,15 +174,10 @@ public class LoginPage implements java.io.Serializable {
 
         authReq.setIpAddress( dvRequestService.getDataverseRequest().getSourceAddress() );
         try {
-
-            logger.log(Level.FINE, "JC user redirectPage = {0}", redirectPage);
             AuthenticatedUser r = authSvc.getUpdateAuthenticatedUser(credentialsAuthProviderId, authReq);
-            logger.log(Level.FINE, "JC User authenticated: {0}", r.getEmail());
             session.setUser(r);
             String affiliation = r.getAffiliation();
-            logger.log(Level.FINE, "JC user affiliation = {0}", affiliation);
             String alias = affiliationBean.getAlias(affiliation);
-            logger.log(Level.FINE, "JC user alias = {0}", alias);
             Dataverse dv = dataverseService.findByAlias(alias);
             if (dv == null || !dv.isReleased()) {
                 alias = "";
@@ -198,15 +193,12 @@ public class LoginPage implements java.io.Serializable {
                 redirectPage = redirectToRoot();
             }
 
-            logger.log(Level.FINE, "JC user redirectPage = {0}", redirectPage);
             try {            
                 redirectPage = URLDecoder.decode(redirectPage, "UTF-8");
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(LoginPage.class.getName()).log(Level.SEVERE, null, ex);
                 redirectPage = redirectToRoot();
             }
-
-            logger.log(Level.FINE, "JC user redirectPage = {0}", redirectPage);
 
             logger.log(Level.FINE, "Sending user to = {0}", redirectPage);
             return redirectPage + (!redirectPage.contains("?") ? "?" : "&") + "faces-redirect=true";

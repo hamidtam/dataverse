@@ -63,11 +63,6 @@ public class AffiliationGroupServiceBean {
             topLevelDomain = domain;
         }
 
-        // JC - throws error because qc.ca gives multiple results
-        // cmontmorency.qc.ca , cdc.qc.ca , cmaisonneuve.qc.ca
-
-        // topleveldomain = qc.ca
-
         AffiliationGroup group = matchByTopLevelEmailDomain(topLevelDomain,domain);
 
         if (group != null) {

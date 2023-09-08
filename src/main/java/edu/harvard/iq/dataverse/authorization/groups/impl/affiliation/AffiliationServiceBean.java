@@ -66,10 +66,6 @@ public class AffiliationServiceBean implements Serializable {
         while (enumeration.hasMoreElements()) {
             String next = enumeration.nextElement();
             String value = bundle.getString(next);
-
-            logger.log(Level.FINE, "JC next = {0}  ", next);
-            logger.log(Level.FINE, "JC value = {0}  ", value);
-
             if (value.equalsIgnoreCase(userAffiliation)) {
                 String alias = next.substring(next.indexOf(".") + 1);
                 if(alias.equalsIgnoreCase("jonquiere") ||
@@ -79,12 +75,10 @@ public class AffiliationServiceBean implements Serializable {
                         alias.equalsIgnoreCase("maisonneuve")
                 )
                 {
-                    logger.log(Level.FINE, "JC getAlias = {0}", alias);
                     return "cegep";
                 }
                 else
                 {
-                    logger.log(Level.FINE, "JC getAlias = {0}", alias);
                     return alias;
                 }
             }
