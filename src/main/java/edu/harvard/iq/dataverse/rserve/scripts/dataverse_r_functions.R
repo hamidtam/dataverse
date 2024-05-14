@@ -1,8 +1,10 @@
+.libPaths('/usr/lib64/R/library')
 library(foreign)
 library(stats)
 library(methods)
 library(R2HTML)
 library(haven)
+library(openxlsx)
 
 options(digits.secs = 3)
 
@@ -372,6 +374,18 @@ createDataverseDataFrame<-function(dtfrm, dwnldoptn, dsnprfx) {
     # SAVE AS R WORKSPACE: 
     save(x,file=dsnprfx)
 } # end of createDataverseDataFrame
+
+direct_export_advanced <- function(file, fmt, dsnprfx){
+    if (fmt == "dta"){
+        table <- read_dta(file)
+    } else if (fmt == "sav"){
+        table <- read_sav(file)
+    } else if (fmt == "por"){
+        table <- read_por(file)
+    }
+    write.xlsx(table, file=dsnprfx, asTable = TRUE)
+
+}
 
 direct_export <- function(file, fmt, dsnprfx){
     if (fmt == "dta"){

@@ -212,6 +212,24 @@
                         #{bundle['file.downloadBtn.format.rdata']}
                     </p:commandLink>
                 </li>
+                <li>
+                    <p:commandLink styleClass="btn-download" rendered="#{!guestbookAndTermsPopupRequired}"
+                                   process="@this"
+                                   disabled="#{(fileMetadata.dataFile.ingestInProgress or lockedFromDownload) ? 'disabled' : ''}"
+                                   actionListener="#{fileDownloadService.writeGuestbookAndStartFileDownload(guestbookResponse, fileMetadata, 'xlsx')}">
+                        #{bundle['file.downloadBtn.format.excel']}
+                    </p:commandLink>
+                    <p:commandLink styleClass="btn-download" rendered="#{guestbookAndTermsPopupRequired}"
+                                   process="@this"
+                                   disabled="#{(fileMetadata.dataFile.ingestInProgress or lockedFromDownload) ? 'disabled' : ''}"
+                                   actionListener="#{guestbookResponseService.modifyDatafileAndFormat(guestbookResponse, fileMetadata, 'xlsx' )}"
+                                   update="@widgetVar(guestbookAndTermsPopup)"
+                                   oncomplete="PF('guestbookAndTermsPopup').show();handleResizeDialog('guestbookAndTermsPopup');">
+                        <f:actionListener binding="#{bean.setTermsGuestbookPopupAction(bundle.download)}"/>
+                        <f:setPropertyActionListener target="#{fileMetadataForAction}" value="#{fileMetadata}" />
+                        #{bundle['file.downloadBtn.format.excel']}
+                    </p:commandLink>
+                </li>
             </ui:fragment>
         </ui:fragment>
         <!-- END: TABULAR DOWNLOAD OPTIONS -->

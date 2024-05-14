@@ -280,7 +280,9 @@ public class Access extends AbstractApiBean {
     @Path("datafile/{fileId:.+}")
     @Produces({"application/xml"})
     public Response datafile(@Context ContainerRequestContext crc, @PathParam("fileId") String fileId, @QueryParam("gbrecs") boolean gbrecs, @Context UriInfo uriInfo, @Context HttpHeaders headers, @Context HttpServletResponse response) /*throws NotFoundException, ServiceUnavailableException, PermissionDeniedException, AuthorizationRequiredException*/ {
-        
+
+        logger.info("plzremove 222");
+
         // check first if there's a trailing slash, and chop it: 
         while (fileId.lastIndexOf('/') == fileId.length() - 1) {
             fileId = fileId.substring(0, fileId.length() - 1);
@@ -326,17 +328,23 @@ public class Access extends AbstractApiBean {
             dInfo.addServiceAvailable(new OptionalAccessService("original", originalMimeType, "format=original","Saved original (" + originalMimeType + ")"));
             dInfo.addServiceAvailable(new OptionalAccessService("tabular", "text/tab-separated-values", "format=tab", "Tabular file in native format"));
             dInfo.addServiceAvailable(new OptionalAccessService("R", "application/x-rlang-transport", "format=RData", "Data in R format"));
-            dInfo.addServiceAvailable(new OptionalAccessService("preprocessed", "application/json", "format=prep", "Preprocessed data in JSON"));
+            logger.info("plzremove 333");
+            dInfo.addServiceAvailable(new OptionalAccessService("Excel", "application/ms-excel", "format=xlsx", "Data in Excel format"));
+            logger.info("plzremove 444");
             dInfo.addServiceAvailable(new OptionalAccessService("subset", "text/tab-separated-values", "variables=&lt;LIST&gt;", "Column-wise Subsetting"));
         }
         String driverId = DataAccess.getStorageDriverFromIdentifier(df.getStorageIdentifier());
         if(systemConfig.isGlobusFileDownload() && (GlobusAccessibleStore.acceptsGlobusTransfers(driverId) || GlobusAccessibleStore.allowsGlobusReferences(driverId))) {
             dInfo.addServiceAvailable(new OptionalAccessService("GlobusTransfer", df.getContentType(), "format=GlobusTransfer", "Download via Globus"));
         }
+
+        logger.info("plzremove 445");
         
         DownloadInstance downloadInstance = new DownloadInstance(dInfo);
         downloadInstance.setRequestUriInfo(uriInfo);
         downloadInstance.setRequestHttpHeaders(headers);
+
+        logger.info("plzremove 446");
         
         if (gbr != null){
             downloadInstance.setGbr(gbr);
@@ -345,6 +353,8 @@ public class Access extends AbstractApiBean {
         }
         boolean serviceRequested = false;
         boolean serviceFound = false;
+
+        logger.info("plzremove 447");
 
         for (String key : uriInfo.getQueryParameters().keySet()) {
             String value = uriInfo.getQueryParameters().getFirst(key);
@@ -362,6 +372,7 @@ public class Access extends AbstractApiBean {
                     break;
                 }
                 //Only need to check if this key is associated with a service
+                logger.info("plzremove 501");
                 if (downloadInstance.checkIfServiceSupportedAndSetConverter(key, value)) {
                     // this automatically sets the conversion parameters in
                     // the download instance to key and value;
@@ -382,6 +393,7 @@ public class Access extends AbstractApiBean {
                                 } catch (NumberFormatException nfe) {
                                     variableId = null;
                                 }
+                                logger.info("plzremove 502");
                                 if (variableId != null) {
                                     logger.fine("attempting to look up variable id " + variableId);
                                     if (variableService != null) {
@@ -404,7 +416,7 @@ public class Access extends AbstractApiBean {
                             }
                         }
                     }
-
+                    logger.info("plzremove 503");
                     logger.fine("downloadInstance: " + downloadInstance.getConversionParam() + "," + downloadInstance.getConversionParamValue());
                     serviceFound = true;
                     break;
@@ -592,9 +604,11 @@ public class Access extends AbstractApiBean {
                                                   @Context UriInfo uriInfo,
                                                   @Context HttpHeaders headers,
                                                   @Context HttpServletResponse response) throws ServiceUnavailableException {
-    
+
         DataFile df = findDataFileOrDieWrapper(fileId);
-        
+
+        logger.info("plzremove 1");
+
         DownloadInfo dInfo = new DownloadInfo(df);
         boolean publiclyAvailable = false; 
 

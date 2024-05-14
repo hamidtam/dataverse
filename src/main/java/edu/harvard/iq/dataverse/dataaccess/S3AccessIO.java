@@ -873,7 +873,7 @@ public class S3AccessIO<T extends DvObject> extends StorageIO<T> {
      * @param auxiliaryType (optional) - aux. mime type, if different from the main type
      * @param auxiliaryFileName (optional) - file name, if different from the main file label. 
      * @return redirect url
-     * @throws IOException.
+     * @throws IOException
      */
     public String generateTemporaryDownloadUrl(String auxiliaryTag, String auxiliaryType, String auxiliaryFileName) throws IOException {
         //Questions:
@@ -991,8 +991,10 @@ public class S3AccessIO<T extends DvObject> extends StorageIO<T> {
         GeneratePresignedUrlRequest generatePresignedUrlRequest = 
                 new GeneratePresignedUrlRequest(bucketName, key).withMethod(HttpMethod.PUT).withExpiration(expiration);
         //Require user to add this header to indicate a temporary file
-        generatePresignedUrlRequest.putCustomRequestHeader(Headers.S3_TAGGING, "dv-state=temp");
-        
+
+        // JC commented the below line due to CORS issue
+        //generatePresignedUrlRequest.putCustomRequestHeader(Headers.S3_TAGGING, "dv-state=temp");
+
         URL presignedUrl; 
         try {
             presignedUrl = s3.generatePresignedUrl(generatePresignedUrlRequest);

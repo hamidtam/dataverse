@@ -118,29 +118,45 @@ public class RemoteDataFrameService {
         
         Map<String, String> result = new HashMap<>();
         try {
+            logger.info("plzremove 7777");
             RConnection connection = setupConnection();
             // send the data file to the Rserve side:
             InputStream inFile = new BufferedInputStream(new FileInputStream(originalFile));
-
+            logger.info("plzremove 7778");
             RFileOutputStream rOutFile = connection.createFile(tempFileNameIn);
             copyWithBuffer(inFile, rOutFile, 1024);
-                        
+
             // We need to initialize our R session:
             // send custom R code library over to the Rserve and load the code:
             String rscript = readLocalResource(DATAVERSE_R_FUNCTIONS);
-            connection.voidEval(rscript);
-            
+            //connection.voidEval("source('/data/domain1/applications/dataverse-6.2x/WEB-INF/classes/edu/harvard/iq/dataverse/rserve/scripts/dataverse_r_functions.R')");
+            logger.info("plzremove 7778aaaa");
+            //connection.voidEval(rscript);
+
+
+            REXP rResponseObject = connection.parseAndEval(
+                    "try(eval("+"source('/data/domain1/applications/dataverse-6.2x/WEB-INF/classes/edu/harvard/iq/dataverse/rserve/scripts/dataverse_r_functions.R')"+"),silent=TRUE)");
+            if (rResponseObject.inherits("try-error")) {
+                logger.info("R Serve Eval Exception : "+rResponseObject.asString());
+            }
+
+            connection.voidEval("source('/data/domain1/applications/dataverse-6.2x/WEB-INF/classes/edu/harvard/iq/dataverse/rserve/scripts/dataverse_r_functions.R')");
             String dataFileName = "Data." + PID + ".RData";
             
             // data file to be copied back to the dvn
+            logger.info("plzremove 7779");
             String dsnprfx = RSERVE_TMP_DIR + "/" + dataFileName;
+            logger.info(dsnprfx);
             
             String command = "direct_export(file='"+tempFileNameIn+"'," +
                              "fmt='" + fmt + "'" + ", dsnprfx='" + dsnprfx + "')";
+            logger.info("plzremove 7780");
+            //logger.info("R Serve Eval Exception : "+rResponseObject.asString());
                         
             connection.voidEval(command);
             
             int wbFileSize = getFileSize(connection, dsnprfx);
+            logger.info(RWRKSP_FILE_PREFIX + wbFileSize);
             File localDataFrameFile = transferRemoteFile(connection, dsnprfx, RWRKSP_FILE_PREFIX,"RData", wbFileSize);
             
             if (localDataFrameFile != null){
@@ -150,21 +166,22 @@ public class RemoteDataFrameService {
                 logger.fine("data frame file is null!");
                 // throw an exception??
             }
-            
+            logger.info("plzremove 7781");
             result.put("Rversion", connection.eval("R.Version()$version.string").asString());
             
             logger.fine("result object (before closing the Rserve):\n"+result);
             
             String deleteLine = "file.remove('"+tempFileNameIn+"')";
             connection.eval(deleteLine);
- 
             connection.close();
         
         } catch (IOException | REXPMismatchException | RserveException e) {
             logger.severe(e.getMessage());
             result.put("RexecError", "true");
+        } catch (REngineException e) {
+            throw new RuntimeException(e);
         }
-        
+
         return result;
     }
     
@@ -177,7 +194,63 @@ public class RemoteDataFrameService {
      * @return    a Map that contains various information about results
     
      * TODO: replace this Map with a dedicated RJobResult object; -- L.A. 4.0 alpha 1
-     */    
+     */
+
+    public Map<String, String> directConvertAdvanced(File originalFile, String fmt){
+
+        Map<String, String> result = new HashMap<>();
+        try {
+            RConnection connection = setupConnection();
+            // send the data file to the Rserve side:
+            InputStream inFile = new BufferedInputStream(new FileInputStream(originalFile));
+
+            RFileOutputStream rOutFile = connection.createFile(tempFileNameIn);
+            copyWithBuffer(inFile, rOutFile, 1024);
+
+            // We need to initialize our R session:
+            // send custom R code library over to the Rserve and load the code:
+            //String rscript = readLocalResource(DATAVERSE_R_FUNCTIONS);
+            //connection.voidEval(rscript);
+
+            connection.voidEval("source('/data/domain1/applications/dataverse-6.2x/WEB-INF/classes/edu/harvard/iq/dataverse/rserve/scripts/dataverse_r_functions.R')");
+
+            String dataFileName = "Data." + PID + ".xlsx";
+
+            // data file to be copied back to the dvn
+            String dsnprfx = RSERVE_TMP_DIR + "/" + dataFileName;
+
+            String command = "direct_export_advanced(file='"+tempFileNameIn+"'," +
+                    "fmt='" + fmt + "'" + ", dsnprfx='" + dsnprfx + "')";
+
+            connection.voidEval(command);
+
+            int wbFileSize = getFileSize(connection, dsnprfx);
+            File localDataFrameFile = transferRemoteFile(connection, dsnprfx, RWRKSP_FILE_PREFIX,"xlsx", wbFileSize);
+
+            if (localDataFrameFile != null){
+                logger.fine("data frame file name: "+localDataFrameFile.getAbsolutePath());
+                result.put("dataFrameFileName",localDataFrameFile.getAbsolutePath());
+            } else {
+                logger.fine("data frame file is null!");
+                // throw an exception??
+            }
+
+            result.put("Rversion", connection.eval("R.Version()$version.string").asString());
+
+            logger.fine("result object (before closing the Rserve):\n"+result);
+
+            String deleteLine = "file.remove('"+tempFileNameIn+"')";
+            connection.eval(deleteLine);
+
+            connection.close();
+
+        } catch (IOException | REXPMismatchException | RserveException e) {
+            logger.severe(e.getMessage());
+            result.put("RexecError", "true");
+        }
+
+        return result;
+    }
     
     public Map<String, String> execute(RJobRequest jobRequest) {
         logger.fine("RemoteDataFrameService: execute() starts here.");
@@ -754,6 +827,8 @@ public class RemoteDataFrameService {
 
         // Get stream
         InputStream resourceStream = RemoteDataFrameService.class.getResourceAsStream(path);
+        logger.info(RemoteDataFrameService.class.getResource(path).getPath());
+
         String resourceAsString = "";
 
         // Try opening a buffered reader stream

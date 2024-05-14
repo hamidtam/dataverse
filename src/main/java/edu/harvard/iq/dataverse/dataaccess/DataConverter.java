@@ -73,6 +73,8 @@ public class DataConverter {
     
     public static String FILE_TYPE_TAB = "tab";
     public static String FILE_TYPE_RDATA = "RData";
+
+    public static String FILE_TYPE_EXCEL = "xlsx";
     
     public static String SERVICE_REQUEST_CONVERT = "convert";
     
@@ -227,8 +229,68 @@ public class DataConverter {
         File formatConvertedFile;
         // create the service instance
         RemoteDataFrameService dfs = new RemoteDataFrameService();
+
+        if ("xlsx".equals(formatRequested)) {
+            logger.info("plzremove01010b");
+            String origFormat = file.getOriginalFileFormat();
+            Map<String, String> resultInfo;
+            if (origFormat.contains("stata") || origFormat.contains("spss")){
+                if (origFormat.contains("stata")){
+                    origFormat = "dta";
+                } else if (origFormat.contains("sav")){
+                    origFormat = "sav";
+                } else if (origFormat.contains("por")){
+                    origFormat = "por";
+                }
+
+                try {
+                    StorageIO<DataFile> storageIO = file.getStorageIO();
+                    long size = storageIO.getAuxObjectSize("orig");
+                    try (ReadableByteChannel origChannel = (ReadableByteChannel) storageIO.openAuxChannel("orig")) {
+                        File origFile = downloadFromByteChannel(origChannel, size);
+                        logger.info("plzremove03030");
+                        resultInfo = dfs.directConvertAdvanced(origFile, origFormat);
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    return null;
+                }
+
+            } else{
+                List<DataVariable> dataVariables = file.getDataTable().getDataVariables();
+                Map<String, Map<String, String>> vls = getValueTableForRequestedVariables(dataVariables);
+                logger.fine("format conversion: variables(getDataVariableForRequest())=" + dataVariables + "\n");
+                logger.fine("format conversion: variables(dataVariables)=" + dataVariables + "\n");
+                logger.fine("format conversion: value table(vls)=" + vls + "\n");
+                RJobRequest sro = new RJobRequest(dataVariables, vls);
+
+                sro.setTabularDataFileName(tabFile.getAbsolutePath());
+                sro.setRequestType(SERVICE_REQUEST_CONVERT);
+                sro.setFormatRequested(FILE_TYPE_EXCEL);
+
+                // execute the service
+                resultInfo = dfs.execute(sro);
+            }
+
+
+            //resultInfo.put("offlineCitation", citation);
+            logger.fine("resultInfo="+resultInfo+"\n");
+
+            // check whether a requested file is actually created
+
+            if ("true".equals(resultInfo.get("RexecError"))){
+                logger.fine("R-runtime error trying to convert a file.");
+                return  null;
+            }
+            String dataFrameFileName = resultInfo.get("dataFrameFileName");
+            logger.fine("data frame file name: "+dataFrameFileName);
+
+            formatConvertedFile = new File(dataFrameFileName);
+
+        }
         
-        if ("RData".equals(formatRequested)) {
+        else if ("RData".equals(formatRequested)) {
+            logger.info("plzremove01010");
             String origFormat = file.getOriginalFileFormat();
             Map<String, String> resultInfo;
             if (origFormat.contains("stata") || origFormat.contains("spss")){
@@ -245,6 +307,7 @@ public class DataConverter {
                     long size = storageIO.getAuxObjectSize("orig");
                     try (ReadableByteChannel origChannel = (ReadableByteChannel) storageIO.openAuxChannel("orig")) {
                       File origFile = downloadFromByteChannel(origChannel, size);
+                      logger.info("plzremove03030");
                       resultInfo = dfs.directConvert(origFile, origFormat);
                     }
                 } catch (IOException ex) {
@@ -268,6 +331,7 @@ public class DataConverter {
                 resultInfo = dfs.execute(sro);
             }
 
+
             //resultInfo.put("offlineCitation", citation);
             logger.fine("resultInfo="+resultInfo+"\n");
 
@@ -281,13 +345,14 @@ public class DataConverter {
             logger.fine("data frame file name: "+dataFrameFileName);
 
             formatConvertedFile = new File(dataFrameFileName);
+
         } else if ("prep".equals(formatRequested)) {
             formatConvertedFile = dfs.runDataPreprocessing(file);
         } else {
             logger.warning("Unsupported file format requested: "+formatRequested);
             return null; 
         }
-            
+
 
         if (formatConvertedFile == null || !formatConvertedFile.exists()) {
             logger.warning("Format-converted file was not properly created.");

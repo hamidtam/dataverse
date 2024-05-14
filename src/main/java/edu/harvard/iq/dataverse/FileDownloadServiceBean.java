@@ -6,6 +6,7 @@ import edu.harvard.iq.dataverse.authorization.users.ApiToken;
 import edu.harvard.iq.dataverse.authorization.users.AuthenticatedUser;
 import edu.harvard.iq.dataverse.authorization.users.User;
 import edu.harvard.iq.dataverse.dataaccess.DataAccess;
+import edu.harvard.iq.dataverse.dataaccess.DataConverter;
 import edu.harvard.iq.dataverse.dataaccess.StorageIO;
 import edu.harvard.iq.dataverse.engine.command.DataverseRequest;
 import edu.harvard.iq.dataverse.engine.command.exception.CommandException;
@@ -24,11 +25,7 @@ import edu.harvard.iq.dataverse.util.URLTokenUtil;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
@@ -173,11 +170,22 @@ public class FileDownloadServiceBean implements java.io.Serializable {
     }
     
     public void writeGuestbookAndStartFileDownload(GuestbookResponse guestbookResponse, FileMetadata fileMetadata, String format) {
+
+        logger.info("plzremove 4444");
+        logger.info(guestbookResponse.toString());
+        logger.info(fileMetadata.toString());
+        logger.info(format);
+
         if(!fileMetadata.getDatasetVersion().isDraft()){
+
+            logger.info("plzremove 4443");
+
             guestbookResponse = guestbookResponseService.modifyDatafileAndFormat(guestbookResponse, fileMetadata, format);
             writeGuestbookResponseRecord(guestbookResponse);
         }
-        
+
+        logger.info("plzremove 4442");
+
         // Make sure to set the "do not write Guestbook response" flag to TRUE when calling the Access API:
         redirectToDownloadAPI(format, fileMetadata.getDataFile().getId(), true, fileMetadata.getId());
         logger.fine("issued file download redirect for filemetadata "+fileMetadata.getId()+", datafile "+fileMetadata.getDataFile().getId());
@@ -239,6 +247,7 @@ public class FileDownloadServiceBean implements java.io.Serializable {
     
     public void writeGuestbookResponseRecord(GuestbookResponse guestbookResponse) {
         try {
+
             CreateGuestbookResponseCommand cmd = new CreateGuestbookResponseCommand(dvRequestService.getDataverseRequest(), guestbookResponse, guestbookResponse.getDataset());
             commandEngine.submit(cmd);
             DatasetVersion version = guestbookResponse.getDatasetVersion();
@@ -316,6 +325,9 @@ public class FileDownloadServiceBean implements java.io.Serializable {
             Long fileMetadataId) {
         String fileDownloadUrl = FileUtil.getFileDownloadUrlPath(downloadType, fileId, guestBookRecordAlreadyWritten,
                 fileMetadataId);
+        logger.info(downloadType);
+        logger.info(fileDownloadUrl);
+        logger.info("plzremove 7979");
         if ("GlobusTransfer".equals(downloadType)) {
             PrimeFaces.current().executeScript(URLTokenUtil.getScriptForUrl(fileDownloadUrl));
         } else {
