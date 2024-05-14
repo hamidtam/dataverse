@@ -133,14 +133,9 @@ public class RemoteDataFrameService {
             logger.info("plzremove 7778aaaa");
             //connection.voidEval(rscript);
 
+            String rscript_path = RemoteDataFrameService.class.getResource(DATAVERSE_R_FUNCTIONS).getPath();
 
-            REXP rResponseObject = connection.parseAndEval(
-                    "try(eval("+"source('/data/domain1/applications/dataverse-6.2x/WEB-INF/classes/edu/harvard/iq/dataverse/rserve/scripts/dataverse_r_functions.R')"+"),silent=TRUE)");
-            if (rResponseObject.inherits("try-error")) {
-                logger.info("R Serve Eval Exception : "+rResponseObject.asString());
-            }
-
-            connection.voidEval("source('/data/domain1/applications/dataverse-6.2x/WEB-INF/classes/edu/harvard/iq/dataverse/rserve/scripts/dataverse_r_functions.R')");
+            connection.voidEval("source(rscript_path)");
             String dataFileName = "Data." + PID + ".RData";
             
             // data file to be copied back to the dvn
@@ -212,7 +207,9 @@ public class RemoteDataFrameService {
             //String rscript = readLocalResource(DATAVERSE_R_FUNCTIONS);
             //connection.voidEval(rscript);
 
-            connection.voidEval("source('/data/domain1/applications/dataverse-6.2x/WEB-INF/classes/edu/harvard/iq/dataverse/rserve/scripts/dataverse_r_functions.R')");
+            String rscript_path = RemoteDataFrameService.class.getResource(DATAVERSE_R_FUNCTIONS).getPath();
+
+            connection.voidEval("source(rscript_path)");
 
             String dataFileName = "Data." + PID + ".xlsx";
 
