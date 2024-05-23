@@ -249,7 +249,7 @@ public class DataConverter {
                     try (ReadableByteChannel origChannel = (ReadableByteChannel) storageIO.openAuxChannel("orig")) {
                         File origFile = downloadFromByteChannel(origChannel, size);
                         logger.info("plzremove03030");
-                        resultInfo = dfs.directConvertAdvanced(origFile, origFormat);
+                        resultInfo = dfs.directConvertAdvanced(origFile, origFormat, formatRequested);
                     }
                 } catch (IOException ex) {
                     ex.printStackTrace();

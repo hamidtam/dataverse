@@ -73,6 +73,8 @@ public class RemoteDataFrameService {
 
     private static String TMP_TABDATA_FILE_EXT = ".tab";
     private static String TMP_RDATA_FILE_EXT = ".RData";
+
+    private static String TMP_EXCEL_FILE_EXT = ".xlsx";
     
     // These settings have sane defaults in resources/META-INF/microprofile-config.properties,
     // ready to be overridden by a sysadmin
@@ -118,36 +120,27 @@ public class RemoteDataFrameService {
         
         Map<String, String> result = new HashMap<>();
         try {
-            logger.info("plzremove 7777");
             RConnection connection = setupConnection();
             // send the data file to the Rserve side:
             InputStream inFile = new BufferedInputStream(new FileInputStream(originalFile));
-            logger.info("plzremove 7778");
             RFileOutputStream rOutFile = connection.createFile(tempFileNameIn);
             copyWithBuffer(inFile, rOutFile, 1024);
 
             // We need to initialize our R session:
             // send custom R code library over to the Rserve and load the code:
-            String rscript = readLocalResource(DATAVERSE_R_FUNCTIONS);
-            //connection.voidEval("source('/data/domain1/applications/dataverse-6.2x/WEB-INF/classes/edu/harvard/iq/dataverse/rserve/scripts/dataverse_r_functions.R')");
-            logger.info("plzremove 7778aaaa");
-            //connection.voidEval(rscript);
+            //String rscript = readLocalResource(DATAVERSE_R_FUNCTIONS);
+            String rscript_path = "'"+RemoteDataFrameService.class.getResource(DATAVERSE_R_FUNCTIONS).getPath()+"'";
+            String source_command = "source("+rscript_path+")";
 
-            String rscript_path = RemoteDataFrameService.class.getResource(DATAVERSE_R_FUNCTIONS).getPath();
-
-            connection.voidEval("source(rscript_path)");
+            connection.voidEval(source_command);
             String dataFileName = "Data." + PID + ".RData";
             
             // data file to be copied back to the dvn
-            logger.info("plzremove 7779");
             String dsnprfx = RSERVE_TMP_DIR + "/" + dataFileName;
-            logger.info(dsnprfx);
-            
+
             String command = "direct_export(file='"+tempFileNameIn+"'," +
                              "fmt='" + fmt + "'" + ", dsnprfx='" + dsnprfx + "')";
-            logger.info("plzremove 7780");
-            //logger.info("R Serve Eval Exception : "+rResponseObject.asString());
-                        
+
             connection.voidEval(command);
             
             int wbFileSize = getFileSize(connection, dsnprfx);
@@ -161,7 +154,6 @@ public class RemoteDataFrameService {
                 logger.fine("data frame file is null!");
                 // throw an exception??
             }
-            logger.info("plzremove 7781");
             result.put("Rversion", connection.eval("R.Version()$version.string").asString());
             
             logger.fine("result object (before closing the Rserve):\n"+result);
@@ -191,7 +183,7 @@ public class RemoteDataFrameService {
      * TODO: replace this Map with a dedicated RJobResult object; -- L.A. 4.0 alpha 1
      */
 
-    public Map<String, String> directConvertAdvanced(File originalFile, String fmt){
+    public Map<String, String> directConvertAdvanced(File originalFile, String fmt, String formatedRequested){
 
         Map<String, String> result = new HashMap<>();
         try {
@@ -205,24 +197,29 @@ public class RemoteDataFrameService {
             // We need to initialize our R session:
             // send custom R code library over to the Rserve and load the code:
             //String rscript = readLocalResource(DATAVERSE_R_FUNCTIONS);
-            //connection.voidEval(rscript);
+            String rscript_path = "'"+RemoteDataFrameService.class.getResource(DATAVERSE_R_FUNCTIONS).getPath()+"'";
+            String source_command = "source("+rscript_path+")";
 
-            String rscript_path = RemoteDataFrameService.class.getResource(DATAVERSE_R_FUNCTIONS).getPath();
+            connection.voidEval(source_command);
 
-            connection.voidEval("source(rscript_path)");
-
-            String dataFileName = "Data." + PID + ".xlsx";
+            String tmpFileExt = "";
+            String dataFileName = "Data." + PID;
+            if (formatedRequested.equals("xlsx")){
+                dataFileName += TMP_EXCEL_FILE_EXT;
+                tmpFileExt = formatedRequested;
+            }
 
             // data file to be copied back to the dvn
             String dsnprfx = RSERVE_TMP_DIR + "/" + dataFileName;
 
             String command = "direct_export_advanced(file='"+tempFileNameIn+"'," +
                     "fmt='" + fmt + "'" + ", dsnprfx='" + dsnprfx + "')";
-
+            logger.info(command);
             connection.voidEval(command);
 
             int wbFileSize = getFileSize(connection, dsnprfx);
-            File localDataFrameFile = transferRemoteFile(connection, dsnprfx, RWRKSP_FILE_PREFIX,"xlsx", wbFileSize);
+
+            File localDataFrameFile = transferRemoteFile(connection, dsnprfx, RWRKSP_FILE_PREFIX,tmpFileExt, wbFileSize);
 
             if (localDataFrameFile != null){
                 logger.fine("data frame file name: "+localDataFrameFile.getAbsolutePath());
