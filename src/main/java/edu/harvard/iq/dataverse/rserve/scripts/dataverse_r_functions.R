@@ -5,9 +5,9 @@ library(methods)
 library(R2HTML)
 library(haven)
 library(openxlsx)
+library(DDIwR)
 
 options(digits.secs = 3)
-
 
 ############ parameters ########################
 univarstathdr<-c("Valid Cases", "Missing Cases(NAs)", "Total", "Mean", "Standard deviation", "Skewness", "Kurtosis", "Coefficient of variation", "Mode", "Minimum","1st Quartile","Median","3rd Quartile","Maximum","Range","Interquartile Range","Normality Test(Shapiro-Wilk Statistic)", "Normality Test(Shapiro-Wilk Statistic: p value)")
@@ -383,8 +383,7 @@ direct_export_advanced <- function(file, fmt, dsnprfx){
     } else if (fmt == "por"){
         table <- read_por(file)
     }
-    write.xlsx(table, file=dsnprfx, asTable = TRUE)
-
+    convert(table, to=dsnprfx)
 }
 
 direct_export <- function(file, fmt, dsnprfx){

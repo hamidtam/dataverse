@@ -1276,8 +1276,11 @@ public class FileUtil implements java.io.Serializable  {
         if (downloadType != null) {
             switch(downloadType) {
             case "original":
-            case"RData":
-            case"xlsx":
+            case "RData":
+            case "xlsx":
+            case "dta": //stata
+            case "sav": //spss
+            case "xpt": //sas
             case "tab":
             case "GlobusTransfer":
                     fileDownloadUrl = "/api/access/datafile/" + fileId + "?format=" + downloadType;

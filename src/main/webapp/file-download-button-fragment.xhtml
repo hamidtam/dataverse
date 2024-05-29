@@ -230,6 +230,60 @@
                         #{bundle['file.downloadBtn.format.excel']}
                     </p:commandLink>
                 </li>
+                <li>
+                    <p:commandLink styleClass="btn-download" rendered="#{!guestbookAndTermsPopupRequired}"
+                                   process="@this"
+                                   disabled="#{(fileMetadata.dataFile.ingestInProgress or lockedFromDownload) ? 'disabled' : ''}"
+                                   actionListener="#{fileDownloadService.writeGuestbookAndStartFileDownload(guestbookResponse, fileMetadata, 'dta')}">
+                        #{bundle['file.downloadBtn.format.stata']}
+                    </p:commandLink>
+                    <p:commandLink styleClass="btn-download" rendered="#{guestbookAndTermsPopupRequired}"
+                                   process="@this"
+                                   disabled="#{(fileMetadata.dataFile.ingestInProgress or lockedFromDownload) ? 'disabled' : ''}"
+                                   actionListener="#{guestbookResponseService.modifyDatafileAndFormat(guestbookResponse, fileMetadata, 'dta' )}"
+                                   update="@widgetVar(guestbookAndTermsPopup)"
+                                   oncomplete="PF('guestbookAndTermsPopup').show();handleResizeDialog('guestbookAndTermsPopup');">
+                        <f:actionListener binding="#{bean.setTermsGuestbookPopupAction(bundle.download)}"/>
+                        <f:setPropertyActionListener target="#{fileMetadataForAction}" value="#{fileMetadata}" />
+                        #{bundle['file.downloadBtn.format.stata']}
+                    </p:commandLink>
+                </li>
+                <li>
+                    <p:commandLink styleClass="btn-download" rendered="#{!guestbookAndTermsPopupRequired}"
+                                   process="@this"
+                                   disabled="#{(fileMetadata.dataFile.ingestInProgress or lockedFromDownload) ? 'disabled' : ''}"
+                                   actionListener="#{fileDownloadService.writeGuestbookAndStartFileDownload(guestbookResponse, fileMetadata, 'sav')}">
+                        #{bundle['file.downloadBtn.format.spss']}
+                    </p:commandLink>
+                    <p:commandLink styleClass="btn-download" rendered="#{guestbookAndTermsPopupRequired}"
+                                   process="@this"
+                                   disabled="#{(fileMetadata.dataFile.ingestInProgress or lockedFromDownload) ? 'disabled' : ''}"
+                                   actionListener="#{guestbookResponseService.modifyDatafileAndFormat(guestbookResponse, fileMetadata, 'sav' )}"
+                                   update="@widgetVar(guestbookAndTermsPopup)"
+                                   oncomplete="PF('guestbookAndTermsPopup').show();handleResizeDialog('guestbookAndTermsPopup');">
+                        <f:actionListener binding="#{bean.setTermsGuestbookPopupAction(bundle.download)}"/>
+                        <f:setPropertyActionListener target="#{fileMetadataForAction}" value="#{fileMetadata}" />
+                        #{bundle['file.downloadBtn.format.spss']}
+                    </p:commandLink>
+                </li>
+                <li>
+                    <p:commandLink styleClass="btn-download" rendered="#{!guestbookAndTermsPopupRequired}"
+                                   process="@this"
+                                   disabled="#{(fileMetadata.dataFile.ingestInProgress or lockedFromDownload) ? 'disabled' : ''}"
+                                   actionListener="#{fileDownloadService.writeGuestbookAndStartFileDownload(guestbookResponse, fileMetadata, 'xpt')}">
+                        #{bundle['file.downloadBtn.format.sas']}
+                    </p:commandLink>
+                    <p:commandLink styleClass="btn-download" rendered="#{guestbookAndTermsPopupRequired}"
+                                   process="@this"
+                                   disabled="#{(fileMetadata.dataFile.ingestInProgress or lockedFromDownload) ? 'disabled' : ''}"
+                                   actionListener="#{guestbookResponseService.modifyDatafileAndFormat(guestbookResponse, fileMetadata, 'xpt' )}"
+                                   update="@widgetVar(guestbookAndTermsPopup)"
+                                   oncomplete="PF('guestbookAndTermsPopup').show();handleResizeDialog('guestbookAndTermsPopup');">
+                        <f:actionListener binding="#{bean.setTermsGuestbookPopupAction(bundle.download)}"/>
+                        <f:setPropertyActionListener target="#{fileMetadataForAction}" value="#{fileMetadata}" />
+                        #{bundle['file.downloadBtn.format.sas']}
+                    </p:commandLink>
+                </li>
             </ui:fragment>
         </ui:fragment>
         <!-- END: TABULAR DOWNLOAD OPTIONS -->

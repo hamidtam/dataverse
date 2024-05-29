@@ -75,6 +75,12 @@ public class RemoteDataFrameService {
     private static String TMP_RDATA_FILE_EXT = ".RData";
 
     private static String TMP_EXCEL_FILE_EXT = ".xlsx";
+
+    public static String TMP_STATA_FILE_EXT = ".dta";
+
+    public static String TMP_SPSS_FILE_EXT = ".sav";
+
+    public static String TMP_SAS_FILE_EXT = ".xpt";
     
     // These settings have sane defaults in resources/META-INF/microprofile-config.properties,
     // ready to be overridden by a sysadmin
@@ -198,14 +204,28 @@ public class RemoteDataFrameService {
             // send custom R code library over to the Rserve and load the code:
             //String rscript = readLocalResource(DATAVERSE_R_FUNCTIONS);
             String rscript_path = "'"+RemoteDataFrameService.class.getResource(DATAVERSE_R_FUNCTIONS).getPath()+"'";
+            logger.info("plzremove456789");
             String source_command = "source("+rscript_path+")";
+            logger.info("plzremove123456");
 
             connection.voidEval(source_command);
 
             String tmpFileExt = "";
             String dataFileName = "Data." + PID;
-            if (formatedRequested.equals("xlsx")){
+            if (formatedRequested.equals("xlsx")) {
                 dataFileName += TMP_EXCEL_FILE_EXT;
+                tmpFileExt = formatedRequested;
+            }
+            if (formatedRequested.equals("dta")) {
+                dataFileName += TMP_STATA_FILE_EXT;
+                tmpFileExt = formatedRequested;
+            }
+            if (formatedRequested.equals("sav")) {
+                dataFileName += TMP_SPSS_FILE_EXT;
+                tmpFileExt = formatedRequested;
+            }
+            if (formatedRequested.equals("xpt")) {
+                dataFileName += TMP_SAS_FILE_EXT;
                 tmpFileExt = formatedRequested;
             }
 
@@ -215,7 +235,13 @@ public class RemoteDataFrameService {
             String command = "direct_export_advanced(file='"+tempFileNameIn+"'," +
                     "fmt='" + fmt + "'" + ", dsnprfx='" + dsnprfx + "')";
             logger.info(command);
-            connection.voidEval(command);
+            //connection.voidEval(command);
+
+            REXP rResponseObject = connection.eval(
+                    "try(eval("+command+"),silent=TRUE)");
+            if (rResponseObject.inherits("try-error")) {
+                logger.info("R Serve Eval Exception : "+rResponseObject.asString());
+            }
 
             int wbFileSize = getFileSize(connection, dsnprfx);
 

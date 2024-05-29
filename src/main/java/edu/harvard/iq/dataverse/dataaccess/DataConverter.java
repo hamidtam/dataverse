@@ -75,6 +75,12 @@ public class DataConverter {
     public static String FILE_TYPE_RDATA = "RData";
 
     public static String FILE_TYPE_EXCEL = "xlsx";
+
+    public static String FILE_TYPE_STATA = "dta";
+
+    public static String FILE_TYPE_SPSS = "sav";
+
+    public static String FILE_TYPE_SAS = "xpt";
     
     public static String SERVICE_REQUEST_CONVERT = "convert";
     
@@ -230,7 +236,7 @@ public class DataConverter {
         // create the service instance
         RemoteDataFrameService dfs = new RemoteDataFrameService();
 
-        if ("xlsx".equals(formatRequested)) {
+        if ("xlsx".equals(formatRequested) || "dta".equals(formatRequested) || "sav".equals(formatRequested) || "xpt".equals(formatRequested)) {
             logger.info("plzremove01010b");
             String origFormat = file.getOriginalFileFormat();
             Map<String, String> resultInfo;
@@ -266,7 +272,18 @@ public class DataConverter {
 
                 sro.setTabularDataFileName(tabFile.getAbsolutePath());
                 sro.setRequestType(SERVICE_REQUEST_CONVERT);
-                sro.setFormatRequested(FILE_TYPE_EXCEL);
+                if ("xlsx".equals(formatRequested)) {
+                    sro.setFormatRequested(FILE_TYPE_EXCEL);
+                }
+                if ("dta".equals(formatRequested)) {
+                    sro.setFormatRequested(FILE_TYPE_STATA);
+                }
+                if ("sav".equals(formatRequested)) {
+                    sro.setFormatRequested(FILE_TYPE_SPSS);
+                }
+                if ("xpt".equals(formatRequested)) {
+                    sro.setFormatRequested(FILE_TYPE_SAS);
+                }
 
                 // execute the service
                 resultInfo = dfs.execute(sro);

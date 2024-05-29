@@ -328,9 +328,10 @@ public class Access extends AbstractApiBean {
             dInfo.addServiceAvailable(new OptionalAccessService("original", originalMimeType, "format=original","Saved original (" + originalMimeType + ")"));
             dInfo.addServiceAvailable(new OptionalAccessService("tabular", "text/tab-separated-values", "format=tab", "Tabular file in native format"));
             dInfo.addServiceAvailable(new OptionalAccessService("R", "application/x-rlang-transport", "format=RData", "Data in R format"));
-            logger.info("plzremove 333");
             dInfo.addServiceAvailable(new OptionalAccessService("Excel", "application/ms-excel", "format=xlsx", "Data in Excel format"));
-            logger.info("plzremove 444");
+            dInfo.addServiceAvailable(new OptionalAccessService("Stata", "application/octet-stream", "format=dta", "Data in Stata format"));
+            dInfo.addServiceAvailable(new OptionalAccessService("SPSS", "application/x-spss-sav", "format=sav", "Data in SPSS format"));
+            dInfo.addServiceAvailable(new OptionalAccessService("SAS", "application/x-sas-xport", "format=xpt", "Data in SAS format"));
             dInfo.addServiceAvailable(new OptionalAccessService("subset", "text/tab-separated-values", "variables=&lt;LIST&gt;", "Column-wise Subsetting"));
         }
         String driverId = DataAccess.getStorageDriverFromIdentifier(df.getStorageIdentifier());
