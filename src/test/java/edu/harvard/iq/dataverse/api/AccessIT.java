@@ -5,6 +5,7 @@
  */
 package edu.harvard.iq.dataverse.api;
 
+import edu.harvard.iq.dataverse.dataaccess.DataConverter;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;

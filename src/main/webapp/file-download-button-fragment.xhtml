@@ -141,7 +141,11 @@
                 <p:commandLink styleClass="highlightBold btn-download" rendered="#{!(guestbookAndTermsPopupRequired)}"
                                process="@this"
                                actionListener="#{fileDownloadService.writeGuestbookAndStartFileDownload(guestbookResponse, fileMetadata, 'bundle')}">
-                    #{bundle['file.downloadBtn.format.all']}
+                    #{bundle['
+
+
+
+                    file.downloadBtn.format.all']}
                 </p:commandLink>
                 <p:commandLink styleClass="highlightBold btn-download" rendered="#{guestbookAndTermsPopupRequired}"
                                process="@this"
@@ -269,13 +273,13 @@
                 <li>
                     <p:commandLink styleClass="btn-download" rendered="#{!guestbookAndTermsPopupRequired}"
                                    process="@this"
-                                   disabled="#{(fileMetadata.dataFile.ingestInProgress or lockedFromDownload) ? 'disabled' : ''}"
+                                   disabled="#{(fileMetadata.dataFile.ingestInProgress or lockedFromDownload or fileMetadata.dataFile.originalFormatLabel == 'xpt') ? 'disabled' : ''}"
                                    actionListener="#{fileDownloadService.writeGuestbookAndStartFileDownload(guestbookResponse, fileMetadata, 'xpt')}">
                         #{bundle['file.downloadBtn.format.sas']}
                     </p:commandLink>
                     <p:commandLink styleClass="btn-download" rendered="#{guestbookAndTermsPopupRequired}"
                                    process="@this"
-                                   disabled="#{(fileMetadata.dataFile.ingestInProgress or lockedFromDownload) ? 'disabled' : ''}"
+                                   disabled="#{(fileMetadata.dataFile.ingestInProgress or lockedFromDownload or fileMetadata.dataFile.originalFormatLabel == 'xpt') ? 'disabled' : ''}"
                                    actionListener="#{guestbookResponseService.modifyDatafileAndFormat(guestbookResponse, fileMetadata, 'xpt' )}"
                                    update="@widgetVar(guestbookAndTermsPopup)"
                                    oncomplete="PF('guestbookAndTermsPopup').show();handleResizeDialog('guestbookAndTermsPopup');">

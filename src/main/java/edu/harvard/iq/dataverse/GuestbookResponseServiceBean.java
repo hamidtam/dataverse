@@ -858,8 +858,6 @@ public class GuestbookResponseServiceBean {
     
     public GuestbookResponse modifyDatafileAndFormat(GuestbookResponse in, FileMetadata fm, String format) {
 
-        logger.info("plzremove 111");
-        logger.info("plzremove 111");
         logger.info(in.toString());
         logger.info(fm.toString());
         logger.info(format);

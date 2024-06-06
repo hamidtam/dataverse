@@ -171,20 +171,15 @@ public class FileDownloadServiceBean implements java.io.Serializable {
     
     public void writeGuestbookAndStartFileDownload(GuestbookResponse guestbookResponse, FileMetadata fileMetadata, String format) {
 
-        logger.info("plzremove 4444");
         logger.info(guestbookResponse.toString());
         logger.info(fileMetadata.toString());
         logger.info(format);
 
         if(!fileMetadata.getDatasetVersion().isDraft()){
 
-            logger.info("plzremove 4443");
-
             guestbookResponse = guestbookResponseService.modifyDatafileAndFormat(guestbookResponse, fileMetadata, format);
             writeGuestbookResponseRecord(guestbookResponse);
         }
-
-        logger.info("plzremove 4442");
 
         // Make sure to set the "do not write Guestbook response" flag to TRUE when calling the Access API:
         redirectToDownloadAPI(format, fileMetadata.getDataFile().getId(), true, fileMetadata.getId());
@@ -327,7 +322,6 @@ public class FileDownloadServiceBean implements java.io.Serializable {
                 fileMetadataId);
         logger.info(downloadType);
         logger.info(fileDownloadUrl);
-        logger.info("plzremove 7979");
         if ("GlobusTransfer".equals(downloadType)) {
             PrimeFaces.current().executeScript(URLTokenUtil.getScriptForUrl(fileDownloadUrl));
         } else {

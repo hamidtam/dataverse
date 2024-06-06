@@ -137,7 +137,7 @@ public class RemoteDataFrameService {
             //String rscript = readLocalResource(DATAVERSE_R_FUNCTIONS);
             String rscript_path = "'"+RemoteDataFrameService.class.getResource(DATAVERSE_R_FUNCTIONS).getPath()+"'";
             String source_command = "source("+rscript_path+")";
-
+            connection.voidEval(".libPaths('/usr/lib64/R/library')");
             connection.voidEval(source_command);
             String dataFileName = "Data." + PID + ".RData";
             
@@ -204,10 +204,8 @@ public class RemoteDataFrameService {
             // send custom R code library over to the Rserve and load the code:
             //String rscript = readLocalResource(DATAVERSE_R_FUNCTIONS);
             String rscript_path = "'"+RemoteDataFrameService.class.getResource(DATAVERSE_R_FUNCTIONS).getPath()+"'";
-            logger.info("plzremove456789");
             String source_command = "source("+rscript_path+")";
-            logger.info("plzremove123456");
-
+            connection.voidEval(".libPaths('/usr/lib64/R/library')");
             connection.voidEval(source_command);
 
             String tmpFileExt = "";

@@ -237,7 +237,6 @@ public class DataConverter {
         RemoteDataFrameService dfs = new RemoteDataFrameService();
 
         if ("xlsx".equals(formatRequested) || "dta".equals(formatRequested) || "sav".equals(formatRequested) || "xpt".equals(formatRequested)) {
-            logger.info("plzremove01010b");
             String origFormat = file.getOriginalFileFormat();
             Map<String, String> resultInfo;
             if (origFormat.contains("stata") || origFormat.contains("spss")){
@@ -254,7 +253,6 @@ public class DataConverter {
                     long size = storageIO.getAuxObjectSize("orig");
                     try (ReadableByteChannel origChannel = (ReadableByteChannel) storageIO.openAuxChannel("orig")) {
                         File origFile = downloadFromByteChannel(origChannel, size);
-                        logger.info("plzremove03030");
                         resultInfo = dfs.directConvertAdvanced(origFile, origFormat, formatRequested);
                     }
                 } catch (IOException ex) {
@@ -307,7 +305,6 @@ public class DataConverter {
         }
         
         else if ("RData".equals(formatRequested)) {
-            logger.info("plzremove01010");
             String origFormat = file.getOriginalFileFormat();
             Map<String, String> resultInfo;
             if (origFormat.contains("stata") || origFormat.contains("spss")){
@@ -324,7 +321,6 @@ public class DataConverter {
                     long size = storageIO.getAuxObjectSize("orig");
                     try (ReadableByteChannel origChannel = (ReadableByteChannel) storageIO.openAuxChannel("orig")) {
                       File origFile = downloadFromByteChannel(origChannel, size);
-                      logger.info("plzremove03030");
                       resultInfo = dfs.directConvert(origFile, origFormat);
                     }
                 } catch (IOException ex) {
