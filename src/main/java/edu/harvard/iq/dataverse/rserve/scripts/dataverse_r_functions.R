@@ -1,4 +1,3 @@
-#.libPaths('/usr/lib64/R/library')
 library(foreign)
 library(stats)
 library(methods)

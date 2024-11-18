@@ -359,6 +359,8 @@ The following R packages (libraries) are required::
     DescTools
     Rserve
     haven
+    openxlsx
+    DDIwR
 
 Install them following the normal R package installation procedures. For example, with the following R commands::
 
@@ -367,6 +369,8 @@ Install them following the normal R package installation procedures. For example
 	install.packages("DescTools", repos="https://cloud.r-project.org/", lib="/usr/lib64/R/library" )
 	install.packages("Rserve", repos="https://cloud.r-project.org/", lib="/usr/lib64/R/library" )
 	install.packages("haven", repos="https://cloud.r-project.org/", lib="/usr/lib64/R/library" )
+	install.packages("openxlsx")
+    install.packages("DDIwR")
 
 Rserve
 ======
